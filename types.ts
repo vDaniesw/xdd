@@ -4,10 +4,10 @@ export interface Project {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  imageurl: string;
   tags: string[];
-  liveUrl?: string;
-  sourceUrl?: string;
+  liveurl?: string;
+  sourceurl?: string;
   created_at?: string;
 }
 
@@ -24,11 +24,11 @@ export interface SocialLink {
 
 export interface SiteContent {
   id: number;
-  heroTitle: string;
-  heroSubtitle: string;
-  heroDescription: string;
-  aboutImage: string;
-  aboutP1: string;
-  aboutP2: string;
-  aboutP3: string;
+  herotitle: string;
+  herosubtitle: string;
+  herodescription: string;
+  aboutimage: string;
+  aboutp1: string;
+  aboutp2: string;
+  aboutp3: string;
 }

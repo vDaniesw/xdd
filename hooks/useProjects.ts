@@ -15,7 +15,7 @@ export const useProjects = () => {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching projects:', error);
+      console.error('Error fetching projects:', error.message || error);
       setProjects([]);
     } else {
       setProjects(data as Project[]);
@@ -27,7 +27,7 @@ export const useProjects = () => {
     fetchProjects();
   }, [fetchProjects]);
 
-  const addProject = async (projectData: Omit<Project, 'id' | 'imageUrl'>, imageFile: File) => {
+  const addProject = async (projectData: Omit<Project, 'id' | 'imageurl'>, imageFile: File) => {
     const fileName = `${uuidv4()}-${imageFile.name}`;
     const { error: uploadError } = await supabase.storage
       .from('project-images')
@@ -46,7 +46,7 @@ export const useProjects = () => {
 
     const { data: insertData, error: insertError } = await supabase
       .from('projects')
-      .insert([{ ...projectData, imageUrl }])
+      .insert([{ ...projectData, imageurl: imageUrl }])
       .select();
 
     if (insertError) {
@@ -75,7 +75,7 @@ export const useProjects = () => {
     }
     
     try {
-        const imageUrl = projectToDelete.imageUrl;
+        const imageUrl = projectToDelete.imageurl;
         const fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
         if (fileName) {
             await supabase.storage.from('project-images').remove([fileName]);

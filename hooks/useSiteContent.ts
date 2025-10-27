@@ -11,17 +11,20 @@ export const useSiteContent = () => {
 
   const fetchContent = useCallback(async () => {
     setLoading(true);
+    // Use .maybeSingle() to prevent an error when the table is empty.
+    // It will return null instead of throwing an error.
     const { data, error } = await supabase
       .from('site_content')
       .select('*')
       .eq('id', CONTENT_ID)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      console.error('Error fetching site content:', error.message);
+      // This will now only log actual database errors, not "zero rows returned".
+      console.error('Error fetching site content:', error.message || error);
       setContent(null);
     } else {
-      setContent(data as SiteContent);
+      setContent(data as SiteContent | null);
     }
     setLoading(false);
   }, []);
@@ -36,12 +39,12 @@ export const useSiteContent = () => {
     if (imageFile) {
         const fileName = `about-image/${uuidv4()}-${imageFile.name}`;
         
-        if (content?.aboutImage) {
+        if (content?.aboutimage) {
             try {
-                const urlParts = content.aboutImage.split('/');
-                const oldFileName = urlParts[urlParts.length - 1];
+                const urlParts = content.aboutimage.split('/');
+                const oldFileName = urlParts.slice(-2).join('/'); // Grabs 'about-image/uuid-name.ext'
                 if (oldFileName && oldFileName.length > 0) {
-                    await supabase.storage.from('site-assets').remove([`about-image/${oldFileName}`]);
+                    await supabase.storage.from('site-assets').remove([oldFileName]);
                 }
             } catch(e) {
                 console.error("Error removing old image:", e);
@@ -61,9 +64,10 @@ export const useSiteContent = () => {
             .from('site-assets')
             .getPublicUrl(fileName);
         
-        finalContent.aboutImage = urlData.publicUrl;
+        finalContent.aboutimage = urlData.publicUrl;
     }
     
+    // .upsert() followed by .select().single() is safe because upsert guarantees the row exists.
     const { data, error } = await supabase
       .from('site_content')
       .upsert({ ...finalContent, id: CONTENT_ID })
