@@ -7,15 +7,18 @@ import { useSiteContent } from '../hooks/useSiteContent';
 import { useToast } from '../context/ToastContext';
 
 const ManageProjects: React.FC = () => {
-    const { projects, addProject, deleteProject } = useProjects();
+    const { projects, addProject, deleteProject, loading } = useProjects();
     const { showToast } = useToast();
-    const [newProject, setNewProject] = useState<Omit<Project, 'id'>>({
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [newProject, setNewProject] = useState<Omit<Project, 'id' | 'imageUrl'>>({
         title: '',
         description: '',
-        imageUrl: '',
         tags: [],
+        liveUrl: '',
+        sourceUrl: '',
     });
     const [tagsInput, setTagsInput] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -25,32 +28,52 @@ const ManageProjects: React.FC = () => {
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
-                const result = reader.result as string;
-                setNewProject({ ...newProject, imageUrl: result });
-                setImagePreview(result);
+                setImagePreview(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if (!imageFile) {
+            showToast('Por favor, selecciona una imagen para el proyecto.', 'error');
+            return;
+        }
+        setIsSubmitting(true);
         const tags = tagsInput.split(',').map(tag => tag.trim()).filter(Boolean);
-        addProject({ ...newProject, tags });
-        showToast('Proyecto añadido con éxito!');
         
-        setNewProject({ title: '', description: '', imageUrl: '', tags: [] });
-        setTagsInput('');
-        setImagePreview(null);
-        const fileInput = document.getElementById('image') as HTMLInputElement;
-        if(fileInput) fileInput.value = '';
+        try {
+            await addProject({ ...newProject, tags }, imageFile);
+            showToast('Proyecto añadido con éxito!');
+            
+            setNewProject({ title: '', description: '', tags: [], liveUrl: '', sourceUrl: '' });
+            setTagsInput('');
+            setImageFile(null);
+            setImagePreview(null);
+            const fileInput = document.getElementById('image') as HTMLInputElement;
+            if(fileInput) fileInput.value = '';
+        } catch (error) {
+            console.error(error);
+            showToast('Error al añadir el proyecto.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleDeleteProject = (projectId: string) => {
-        deleteProject(projectId);
-        showToast('Proyecto eliminado.');
+    const handleDeleteProject = async (projectId: string) => {
+        if(window.confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
+            try {
+                await deleteProject(projectId);
+                showToast('Proyecto eliminado.');
+            } catch (error) {
+                 console.error(error);
+                showToast('Error al eliminar el proyecto.', 'error');
+            }
+        }
     };
 
     return (
@@ -58,93 +81,133 @@ const ManageProjects: React.FC = () => {
             <div className="bg-white dark:bg-secondary/30 backdrop-blur-lg border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Añadir Nuevo Proyecto</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Form fields for new project */}
+                    {/* Form fields */}
                     <div>
                         <label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Título</label>
                         <input type="text" name="title" value={newProject.title} onChange={handleInputChange} required className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                     </div>
                     <div>
                         <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Descripción</label>
-                        <textarea name="description" value={newProject.description} onChange={handleInputChange} required rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
+                        <textarea name="description" value={newProject.description} onChange={handleInputChange} required rows={3} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
                     </div>
                      <div>
                         <label htmlFor="tags" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Etiquetas (separadas por coma)</label>
                         <input type="text" name="tags" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} required className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                     </div>
                     <div>
+                        <label htmlFor="liveUrl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL del Sitio (Opcional)</label>
+                        <input type="url" name="liveUrl" value={newProject.liveUrl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                    </div>
+                    <div>
+                        <label htmlFor="sourceUrl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL del Código (Opcional)</label>
+                        <input type="url" name="sourceUrl" value={newProject.sourceUrl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                    </div>
+                    <div>
                         <label htmlFor="image" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Imagen del Proyecto</label>
                         <input type="file" id="image" name="image" onChange={handleImageChange} required accept="image/*" className="w-full text-sm text-gray-500 dark:text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-blue-700"/>
                         {imagePreview && <img src={imagePreview} alt="Preview" className="mt-4 rounded-lg max-h-40" />}
                     </div>
-                    <button type="submit" className="w-full bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">Añadir Proyecto</button>
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        {isSubmitting ? 'Añadiendo...' : 'Añadir Proyecto'}
+                    </button>
                 </form>
             </div>
             <div>
                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Proyectos Existentes ({projects.length})</h2>
-                 <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
-                    {projects.map(project => (
-                        <div key={project.id} className="bg-white dark:bg-secondary/30 backdrop-blur-lg p-4 rounded-lg flex items-start gap-4 border border-gray-200 dark:border-gray-800/50">
-                            <img src={project.imageUrl} alt={project.title} className="w-24 h-24 object-cover rounded-md" />
-                            <div className="flex-grow">
-                                <h3 className="font-bold text-gray-800 dark:text-text-primary">{project.title}</h3>
-                                <p className="text-sm text-gray-600 dark:text-text-secondary line-clamp-2">{project.description}</p>
-                                 <div className="flex flex-wrap gap-1 mt-2">
-                                    {project.tags.map(tag => (
-                                    <span key={tag} className="bg-gray-200 text-accent dark:bg-primary dark:text-accent text-xs font-semibold px-2 py-0.5 rounded-full">
-                                        {tag}
-                                    </span>
-                                    ))}
+                 {loading ? (<p>Cargando proyectos...</p>) : (
+                    <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
+                        {projects.map(project => (
+                            <div key={project.id} className="bg-white dark:bg-secondary/30 backdrop-blur-lg p-4 rounded-lg flex items-start gap-4 border border-gray-200 dark:border-gray-800/50">
+                                <img src={project.imageUrl} alt={project.title} className="w-24 h-24 object-cover rounded-md" />
+                                <div className="flex-grow">
+                                    <h3 className="font-bold text-gray-800 dark:text-text-primary">{project.title}</h3>
+                                    <p className="text-sm text-gray-600 dark:text-text-secondary line-clamp-2">{project.description}</p>
+                                    <div className="flex flex-wrap gap-1 mt-2">
+                                        {project.tags.map(tag => (
+                                        <span key={tag} className="bg-gray-200 text-accent dark:bg-primary dark:text-accent text-xs font-semibold px-2 py-0.5 rounded-full">
+                                            {tag}
+                                        </span>
+                                        ))}
+                                    </div>
                                 </div>
+                                <button onClick={() => handleDeleteProject(project.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 rounded-full bg-red-500/10 hover:bg-red-500/20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                                    </svg>
+                                </button>
                             </div>
-                            <button onClick={() => handleDeleteProject(project.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 rounded-full bg-red-500/10 hover:bg-red-500/20">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                    ))}
-                 </div>
+                        ))}
+                    </div>
+                 )}
             </div>
         </div>
     );
 }
 
 const MainContent: React.FC = () => {
-    const { content, updateContent } = useSiteContent();
+    const { content, updateContent, loading } = useSiteContent();
     const { showToast } = useToast();
-    const [formData, setFormData] = useState(content);
-    const [imagePreview, setImagePreview] = useState<string>(content.aboutImage);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState<SiteContent | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    // FIX: This effect synchronizes the local form state with the global context state.
-    // This ensures that the form is always populated with the latest saved data,
-    // solving the issue where changes were lost on refresh.
     useEffect(() => {
-        setFormData(content);
-        setImagePreview(content.aboutImage);
-    }, [content]);
+        if (content) {
+            setFormData(content);
+            setImagePreview(content.aboutImage);
+        } else if (!loading) {
+             setFormData({
+                id: 1,
+                heroTitle: '',
+                heroSubtitle: '',
+                heroDescription: '',
+                aboutImage: '',
+                aboutP1: '',
+                aboutP2: '',
+                aboutP3: '',
+            });
+            setImagePreview(null);
+        }
+    }, [content, loading]);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (formData) {
+            setFormData({ ...formData, [e.target.name]: e.target.value });
+        }
     };
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            setImageFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
-                const result = reader.result as string;
-                setFormData({ ...formData, aboutImage: result });
-                setImagePreview(result);
+                setImagePreview(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        updateContent(formData);
-        showToast('Contenido principal actualizado!');
+        if (!formData) return;
+        setIsSubmitting(true);
+        try {
+            const { id, ...updateData } = formData;
+            await updateContent(updateData, imageFile);
+            showToast('Contenido principal actualizado!');
+            setImageFile(null);
+        } catch (error) {
+            console.error(error);
+            showToast('Error al actualizar el contenido.', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
+
+    if (loading) return <p>Cargando contenido...</p>;
+    if (!formData) return <p>No se pudo cargar el contenido. Por favor, añada contenido nuevo.</p>;
     
     return (
         <div className="bg-white dark:bg-secondary/30 backdrop-blur-lg border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8 max-w-4xl mx-auto">
@@ -183,7 +246,9 @@ const MainContent: React.FC = () => {
                     <label htmlFor="aboutP3" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 3</label>
                     <textarea name="aboutP3" value={formData.aboutP3} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
                 </div>
-                <button type="submit" className="w-full bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">Guardar Cambios</button>
+                <button type="submit" disabled={isSubmitting} className="w-full bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                  {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                </button>
             </form>
         </div>
     );

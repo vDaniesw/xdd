@@ -38,9 +38,25 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
   </div>
 );
 
+const ProjectSkeleton: React.FC = () => (
+    <div className="bg-white dark:bg-secondary rounded-lg overflow-hidden animate-pulse">
+        <div className="w-full h-56 bg-slate-200 dark:bg-slate-700"></div>
+        <div className="p-6">
+            <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full mb-4"></div>
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6 mb-4"></div>
+            <div className="flex flex-wrap gap-2">
+                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-16"></div>
+                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-20"></div>
+                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full w-24"></div>
+            </div>
+        </div>
+    </div>
+);
+
 
 const Projects: React.FC = () => {
-  const { projects } = useProjects();
+  const { projects, loading } = useProjects();
   
   return (
     <section id="projects" className="py-24">
@@ -48,9 +64,13 @@ const Projects: React.FC = () => {
         Mis <span className="text-accent">Proyectos</span>
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
-        ))}
+        {loading ? (
+             Array.from({ length: 3 }).map((_, index) => <ProjectSkeleton key={index} />)
+        ) : (
+            projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+            ))
+        )}
       </div>
     </section>
   );

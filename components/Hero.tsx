@@ -3,12 +3,28 @@ import { SOCIAL_LINKS } from '../constants';
 import { useSiteContent } from '../hooks/useSiteContent';
 
 const Hero: React.FC = () => {
-    const { content } = useSiteContent();
+    const { content, loading } = useSiteContent();
 
     const handleScrollToContact = (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
       document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
     };
+
+    if (loading || !content) {
+        return (
+          <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
+            <div className="max-w-3xl animate-pulse">
+                <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-4"></div>
+                <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-full mb-6"></div>
+                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-5/6 mb-8"></div>
+                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-4/6 mb-8"></div>
+                <div className="flex items-center gap-6">
+                  <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
+                </div>
+            </div>
+          </section>
+        );
+      }
 
   return (
     <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">

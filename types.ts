@@ -8,6 +8,7 @@ export interface Project {
   tags: string[];
   liveUrl?: string;
   sourceUrl?: string;
+  created_at?: string;
 }
 
 export interface Skill {
@@ -22,6 +23,7 @@ export interface SocialLink {
 }
 
 export interface SiteContent {
+  id: number;
   heroTitle: string;
   heroSubtitle: string;
   heroDescription: string;
