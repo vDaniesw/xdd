@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { useToast } from '../context/ToastContext';
+import { SKILLS } from '../constants';
 
 const ManageProjects: React.FC = () => {
     const { projects, addProject, deleteProject, loading } = useProjects();
@@ -168,6 +169,10 @@ const MainContent: React.FC = () => {
                 aboutp1: '',
                 aboutp2: '',
                 aboutp3: '',
+                skills: [],
+                githuburl: '',
+                linkedinurl: '',
+                twitterurl: ''
             });
             setImagePreview(null);
         }
@@ -257,9 +262,117 @@ const MainContent: React.FC = () => {
     );
 }
 
+const ManageLinksAndSkills: React.FC = () => {
+    const { content, updateContent, loading } = useSiteContent();
+    const { showToast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData, setFormData] = useState<Partial<SiteContent>>({
+        githuburl: '',
+        linkedinurl: '',
+        twitterurl: '',
+        skills: []
+    });
+
+    useEffect(() => {
+        if (content) {
+            setFormData({
+                githuburl: content.githuburl || '',
+                linkedinurl: content.linkedinurl || '',
+                twitterurl: content.twitterurl || '',
+                skills: content.skills || []
+            });
+        }
+    }, [content]);
+    
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+    
+    const handleSkillToggle = (skillName: string) => {
+        const currentSkills = formData.skills || [];
+        const newSkills = currentSkills.includes(skillName)
+            ? currentSkills.filter(s => s !== skillName)
+            : [...currentSkills, skillName];
+        setFormData({ ...formData, skills: newSkills });
+    };
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        try {
+            // We need to pass the full content object, so we merge the form data with existing content
+            const finalContent = { ...content, ...formData };
+            const { id, ...updateData } = finalContent as SiteContent;
+            
+            await updateContent(updateData, null); // no image change in this form
+            showToast('Enlaces y habilidades actualizados!');
+        } catch (error) {
+            console.error(error);
+            const errorMessage = (error as Error).message;
+            showToast(`Error al actualizar: ${errorMessage}`, 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    
+    if (loading) return <p>Cargando...</p>
+
+    return (
+        <div className="bg-white dark:bg-secondary/30 backdrop-blur-lg border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8 max-w-4xl mx-auto">
+             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Gestionar Enlaces y Habilidades</h2>
+             <form onSubmit={handleSubmit} className="space-y-8">
+                 {/* Social Links */}
+                <div>
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-text-primary">Enlaces Sociales</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label htmlFor="githuburl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL de GitHub</label>
+                            <input type="url" name="githuburl" value={formData.githuburl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                        </div>
+                         <div>
+                            <label htmlFor="linkedinurl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL de LinkedIn</label>
+                            <input type="url" name="linkedinurl" value={formData.linkedinurl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                        </div>
+                         <div>
+                            <label htmlFor="twitterurl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL de Twitter</label>
+                            <input type="url" name="twitterurl" value={formData.twitterurl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Skills Selection */}
+                <div>
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-text-primary">Tecnologías</h3>
+                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        {SKILLS.map(skill => (
+                            <button
+                                type="button"
+                                key={skill.name}
+                                onClick={() => handleSkillToggle(skill.name)}
+                                className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200
+                                    ${(formData.skills || []).includes(skill.name) 
+                                        ? 'border-accent bg-accent/10 text-accent' 
+                                        : 'border-gray-300 dark:border-gray-600 text-gray-500 dark:text-text-secondary hover:border-accent/50 hover:bg-accent/5'}`
+                                }
+                            >
+                                {React.isValidElement<React.HTMLAttributes<HTMLElement>>(skill.icon) && React.cloneElement(skill.icon)}
+                                <span className="mt-2 text-sm font-semibold text-center">{skill.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <button type="submit" disabled={isSubmitting} className="w-full bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                  {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                </button>
+             </form>
+        </div>
+    );
+}
+
 const AdminDashboard: React.FC = () => {
     const { logout } = useContext(AuthContext);
-    const [activeTab, setActiveTab] = useState<'projects' | 'main'>('projects');
+    const [activeTab, setActiveTab] = useState<'projects' | 'main' | 'links'>('projects');
     
     return (
         <div className="min-h-screen p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-primary transition-colors duration-300">
@@ -275,22 +388,29 @@ const AdminDashboard: React.FC = () => {
                 </header>
 
                 <div className="mb-8 flex border-b border-gray-200 dark:border-gray-700">
+                     <button 
+                        onClick={() => setActiveTab('main')}
+                        className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'main' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                    >
+                        Principal
+                    </button>
                     <button 
                         onClick={() => setActiveTab('projects')}
                         className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'projects' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
                     >
                         Gestionar Proyectos
                     </button>
-                    <button 
-                        onClick={() => setActiveTab('main')}
-                        className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'main' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                     <button 
+                        onClick={() => setActiveTab('links')}
+                        className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'links' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
                     >
-                        Principal
+                        Enlaces y Habilidades
                     </button>
                 </div>
 
                 {activeTab === 'projects' && <ManageProjects />}
                 {activeTab === 'main' && <MainContent />}
+                {activeTab === 'links' && <ManageLinksAndSkills />}
 
             </div>
         </div>

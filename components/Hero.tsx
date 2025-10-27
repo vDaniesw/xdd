@@ -1,6 +1,7 @@
 import React from 'react';
 import { SOCIAL_LINKS } from '../constants';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
     const { content, loading } = useSiteContent();
@@ -9,8 +10,19 @@ const Hero: React.FC = () => {
       e.preventDefault();
       document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
     };
+    
+    // Create dynamic social links based on content from DB
+    const dynamicSocialLinks = content ? [
+        { name: 'GitHub', url: content.githuburl },
+        { name: 'LinkedIn', url: content.linkedinurl },
+        { name: 'Twitter', url: content.twitterurl },
+    ].filter(link => link.url)
+      .map(link => {
+        const staticLink = SOCIAL_LINKS.find(sl => sl.name === link.name);
+        return { ...staticLink, ...link };
+      }) : [];
 
-    if (loading || !content) {
+    if (loading) {
         return (
           <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
             <div className="max-w-3xl animate-pulse">
@@ -25,6 +37,27 @@ const Hero: React.FC = () => {
           </section>
         );
       }
+      
+      if (!content || !content.herotitle) {
+        return (
+            <section id="home" className="min-h-screen flex flex-col justify-center items-center text-center py-20">
+                <div className="max-w-3xl animate-fade-in-up">
+                    <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-text-primary mb-6">
+                        ¡Bienvenido a tu Portafolio!
+                    </h1>
+                    <p className="text-lg md:text-xl text-slate-600 dark:text-text-secondary mb-8">
+                        Parece que el sitio aún no ha sido configurado. Ve al panel de administración para empezar.
+                    </p>
+                    <a
+                        href="/admin"
+                        className="bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                    >
+                        Ir al Administrador
+                    </a>
+                </div>
+            </section>
+        )
+    }
 
   return (
     <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
@@ -47,7 +80,7 @@ const Hero: React.FC = () => {
             Ponte en Contacto
           </a>
           <div className="flex space-x-4">
-            {SOCIAL_LINKS.map(link => (
+            {dynamicSocialLinks.map(link => (
               <a 
                 key={link.name}
                 href={link.url} 
@@ -56,7 +89,6 @@ const Hero: React.FC = () => {
                 className="text-slate-500 dark:text-text-secondary hover:text-accent transition-colors duration-300"
                 aria-label={link.name}
               >
-                {/* FIX: Add generic type to React.isValidElement to inform TypeScript about the element's props, resolving errors with React.cloneElement. */}
                 {React.isValidElement<React.HTMLAttributes<HTMLElement>>(link.icon) && React.cloneElement(link.icon, { className: `${link.icon.props.className || ''} w-8 h-8` })}
               </a>
             ))}

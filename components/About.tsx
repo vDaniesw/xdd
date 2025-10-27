@@ -4,7 +4,7 @@ import { useSiteContent } from '../hooks/useSiteContent';
 const About: React.FC = () => {
   const { content, loading } = useSiteContent();
 
-  if (loading || !content) {
+  if (loading) {
     return (
         <section id="about" className="py-24 animate-pulse">
             <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded w-48 mx-auto mb-12"></div>
@@ -21,6 +21,10 @@ const About: React.FC = () => {
             </div>
         </section>
     );
+  }
+
+  if (!content || (!content.aboutp1 && !content.aboutp2 && !content.aboutp3)) {
+      return null; // Don't render if there's no about text
   }
 
   return (
