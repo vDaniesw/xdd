@@ -25,8 +25,8 @@ const Hero: React.FC = () => {
         return (
           <section id="home" className="min-h-screen flex items-center justify-center py-20">
             <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16 animate-pulse">
-              <div className="w-full md:w-1/3 flex justify-center">
-                <div className="rounded-full bg-slate-200 dark:bg-slate-700 w-64 h-64 md:w-80 md:h-80"></div>
+              <div className="w-full md:w-1/3 flex justify-center md:justify-start">
+                <div className="rounded-full bg-slate-200 dark:bg-slate-700 w-56 h-56 md:w-64 md:h-64"></div>
               </div>
               <div className="w-full md:w-2/3">
                 <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-4"></div>
@@ -63,11 +63,11 @@ const Hero: React.FC = () => {
   return (
     <section id="home" className="min-h-screen flex items-center justify-center py-20">
       <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
-        <div className="w-full md:w-1/3 flex justify-center animate-fade-in-up">
+        <div className="w-full md:w-1/3 flex justify-center md:justify-start animate-fade-in-up">
           <img 
             src={content.aboutimage} 
             alt="AlonxDev Portrait"
-            className="rounded-full w-64 h-64 md:w-80 md:h-80 object-cover border-4 border-slate-200 dark:border-secondary shadow-lg"
+            className="rounded-full w-56 h-56 md:w-64 md:h-64 object-cover border-4 border-slate-200 dark:border-secondary shadow-lg"
           />
         </div>
         <div className="w-full md:w-2/3 text-center md:text-left animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
