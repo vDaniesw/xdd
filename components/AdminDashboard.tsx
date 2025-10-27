@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useContext, ChangeEvent } from 'react';
+import React, { useState, FormEvent, useContext, ChangeEvent, useEffect } from 'react';
 import { useProjects } from '../hooks/useProjects';
 import type { Project, SiteContent } from '../types';
 import { AuthContext } from '../context/AuthContext';
@@ -114,6 +114,14 @@ const MainContent: React.FC = () => {
     const { showToast } = useToast();
     const [formData, setFormData] = useState(content);
     const [imagePreview, setImagePreview] = useState<string>(content.aboutImage);
+
+    // FIX: This effect synchronizes the local form state with the global context state.
+    // This ensures that the form is always populated with the latest saved data,
+    // solving the issue where changes were lost on refresh.
+    useEffect(() => {
+        setFormData(content);
+        setImagePreview(content.aboutImage);
+    }, [content]);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
