@@ -1,7 +1,6 @@
 import React from 'react';
 import { SOCIAL_LINKS } from '../constants';
 import { useSiteContent } from '../hooks/useSiteContent';
-import { Link } from 'react-router-dom';
 
 const Hero: React.FC = () => {
     const { content, loading } = useSiteContent();
@@ -24,21 +23,23 @@ const Hero: React.FC = () => {
 
     if (loading) {
         return (
-          <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
-            <div className="max-w-3xl animate-pulse">
+          <section id="home" className="min-h-screen flex items-center justify-center py-20">
+            <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16 animate-pulse">
+              <div className="w-full md:w-1/3 flex justify-center">
+                <div className="rounded-full bg-slate-200 dark:bg-slate-700 w-64 h-64 md:w-80 md:h-80"></div>
+              </div>
+              <div className="w-full md:w-2/3">
                 <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-4"></div>
                 <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-full mb-6"></div>
                 <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-5/6 mb-8"></div>
-                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-4/6 mb-8"></div>
-                <div className="flex items-center gap-6">
-                  <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
-                </div>
+                <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
+              </div>
             </div>
           </section>
         );
-      }
+    }
       
-      if (!content || !content.herotitle) {
+    if (!content || !content.herotitle) {
         return (
             <section id="home" className="min-h-screen flex flex-col justify-center items-center text-center py-20">
                 <div className="max-w-3xl animate-fade-in-up">
@@ -60,38 +61,47 @@ const Hero: React.FC = () => {
     }
 
   return (
-    <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
-      <div className="max-w-3xl animate-fade-in-up">
-        <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-4">
-          {content.herotitle}
-        </h1>
-        <h2 className="text-3xl md:text-5xl font-semibold text-slate-900 dark:text-text-primary mb-6">
-          {content.herosubtitle}
-        </h2>
-        <p className="text-lg md:text-xl text-slate-600 dark:text-text-secondary mb-8">
-          {content.herodescription}
-        </p>
-        <div className="flex items-center gap-6">
-          <a 
-            href="#contact" 
-            onClick={handleScrollToContact}
-            className="bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
-          >
-            Ponte en Contacto
-          </a>
-          <div className="flex space-x-4">
-            {dynamicSocialLinks.map(link => (
-              <a 
-                key={link.name}
-                href={link.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="text-slate-500 dark:text-text-secondary hover:text-accent transition-colors duration-300"
-                aria-label={link.name}
-              >
-                {React.isValidElement<React.HTMLAttributes<HTMLElement>>(link.icon) && React.cloneElement(link.icon, { className: `${link.icon.props.className || ''} w-8 h-8` })}
-              </a>
-            ))}
+    <section id="home" className="min-h-screen flex items-center justify-center py-20">
+      <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+        <div className="w-full md:w-1/3 flex justify-center animate-fade-in-up">
+          <img 
+            src={content.aboutimage} 
+            alt="AlonxDev Portrait"
+            className="rounded-full w-64 h-64 md:w-80 md:h-80 object-cover border-4 border-slate-200 dark:border-secondary shadow-lg"
+          />
+        </div>
+        <div className="w-full md:w-2/3 text-center md:text-left animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-4">
+            {content.herotitle}
+          </h1>
+          <h2 className="text-3xl md:text-5xl font-semibold text-slate-900 dark:text-text-primary mb-6">
+            {content.herosubtitle}
+          </h2>
+          <p className="text-lg md:text-xl text-slate-600 dark:text-text-secondary mb-8">
+            {content.herodescription}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-6">
+            <a 
+              href="#contact" 
+              onClick={handleScrollToContact}
+              className="bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Ponte en Contacto
+            </a>
+            <div className="flex space-x-4">
+              {dynamicSocialLinks.map(link => (
+                <a 
+                  key={link.name}
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-slate-500 dark:text-text-secondary hover:text-accent transition-colors duration-300"
+                  aria-label={link.name}
+                >
+                  {React.isValidElement<React.HTMLAttributes<HTMLElement>>(link.icon) && React.cloneElement(link.icon, { className: `${link.icon.props.className || ''} w-8 h-8` })}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>
