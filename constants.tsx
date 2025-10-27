@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Project, Skill, SocialLink } from './types';
+import type { Project, Skill, SocialLink, SiteContent } from './types';
 
 // Icons
 const CodeBracketIcon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
@@ -68,4 +68,15 @@ export const SOCIAL_LINKS: SocialLink[] = [
 export const ICONS = {
     CodeBracketIcon,
     GlobeAltIcon
+};
+
+// Site Content Data
+export const INITIAL_SITE_CONTENT: SiteContent = {
+  heroTitle: 'AlonxDev',
+  heroSubtitle: 'Construyo experiencias web modernas.',
+  heroDescription: 'Un apasionado Desarrollador Frontend especializado en crear aplicaciones web elegantes, responsivas y fáciles de usar con React y TypeScript.',
+  aboutImage: 'https://picsum.photos/seed/profile/400/400',
+  aboutP1: '¡Hola! Soy AlonxDev, un desarrollador con una profunda pasión por crear sitios web hermosos y funcionales. Mi viaje en el desarrollo web comenzó con un simple "Hola Mundo", y desde entonces, he quedado cautivado por el poder del código para dar vida a las ideas.',
+  aboutP2: 'Me especializo en el frontend, utilizando tecnologías modernas como React, Next.js y TypeScript para construir interfaces de usuario fluidas. Creo en escribir código limpio y mantenible, y siempre estoy ansioso por aprender nuevas tecnologías y mejorar mis habilidades.',
+  aboutP3: 'Cuando no estoy programando, me puedes encontrar explorando nuevas tendencias tecnológicas, contribuyendo a proyectos de código abierto o disfrutando de una buena taza de café.',
 };

@@ -20,3 +20,13 @@ export interface SocialLink {
   url: string;
   icon: React.ReactElement;
 }
+
+export interface SiteContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  heroDescription: string;
+  aboutImage: string;
+  aboutP1: string;
+  aboutP2: string;
+  aboutP3: string;
+}

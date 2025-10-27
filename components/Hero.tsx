@@ -1,7 +1,10 @@
 import React from 'react';
 import { SOCIAL_LINKS } from '../constants';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 const Hero: React.FC = () => {
+    const { content } = useSiteContent();
+
     const handleScrollToContact = (e: React.MouseEvent<HTMLAnchorElement>) => {
       e.preventDefault();
       document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
@@ -11,13 +14,13 @@ const Hero: React.FC = () => {
     <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
       <div className="max-w-3xl animate-fade-in-up">
         <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-4">
-          AlonxDev
+          {content.heroTitle}
         </h1>
         <h2 className="text-3xl md:text-5xl font-semibold text-slate-900 dark:text-text-primary mb-6">
-          Construyo experiencias web modernas.
+          {content.heroSubtitle}
         </h2>
         <p className="text-lg md:text-xl text-slate-600 dark:text-text-secondary mb-8">
-          Un apasionado Desarrollador Frontend especializado en crear aplicaciones web elegantes, responsivas y fáciles de usar con React y TypeScript.
+          {content.heroDescription}
         </p>
         <div className="flex items-center gap-6">
           <a 
