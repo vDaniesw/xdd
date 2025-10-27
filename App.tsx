@@ -35,7 +35,7 @@ const AppRouter: React.FC = () => {
         return isAuthenticated ? <AdminDashboard /> : <Login />;
     }
     
-    if (path === '/login') {
+    if (path === '/login-55') {
         if (isAuthenticated) {
             window.history.pushState({}, '', '/admin');
             window.dispatchEvent(new Event('pushstate'));

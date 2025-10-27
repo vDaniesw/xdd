@@ -50,23 +50,6 @@ const Header: React.FC = () => {
                 {link.name}
               </a>
             ))}
-            {isAuthenticated ? (
-              <a 
-                href="/admin"
-                onClick={(e) => handleLinkClick(e, '/admin')}
-                className="bg-accent/20 text-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/30 transition-all duration-300"
-              >
-                Dashboard
-              </a>
-            ) : (
-              <a 
-                href="/login"
-                onClick={(e) => handleLinkClick(e, '/login')}
-                className="bg-accent/20 text-accent font-semibold px-4 py-2 rounded-lg hover:bg-accent/30 transition-all duration-300"
-              >
-                Login
-              </a>
-            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -98,25 +81,6 @@ const Header: React.FC = () => {
                     </a>
                 </li>
               ))}
-               <li>
-                {isAuthenticated ? (
-                  <a 
-                    href="/admin" 
-                    onClick={(e) => handleLinkClick(e, '/admin')}
-                    className="block text-accent font-semibold hover:text-blue-400 transition-colors duration-300 py-2"
-                  >
-                    Dashboard
-                  </a>
-                ) : (
-                  <a 
-                    href="/login" 
-                    onClick={(e) => handleLinkClick(e, '/login')}
-                    className="block text-accent font-semibold hover:text-blue-400 transition-colors duration-300 py-2"
-                  >
-                    Login
-                  </a>
-                )}
-              </li>
             </ul>
           </nav>
         )}

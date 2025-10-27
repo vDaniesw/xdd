@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     sessionStorage.removeItem('is-authenticated');
     setIsAuthenticated(false);
-    window.location.href = '/login';
+    window.location.href = '/login-55';
   };
 
   return (
