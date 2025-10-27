@@ -18,7 +18,7 @@ export const useSiteContent = () => {
       .single();
 
     if (error) {
-      console.error('Error fetching site content:', error.message);
+      console.error('Error fetching site content:', error.message || error);
       setContent(null);
     } else {
       setContent(data as SiteContent);
@@ -36,12 +36,12 @@ export const useSiteContent = () => {
     if (imageFile) {
         const fileName = `about-image/${uuidv4()}-${imageFile.name}`;
         
-        if (content?.aboutImage) {
+        if (content?.aboutimage) {
             try {
-                const urlParts = content.aboutImage.split('/');
-                const oldFileName = urlParts[urlParts.length - 1];
+                const urlParts = content.aboutimage.split('/');
+                const oldFileName = urlParts.slice(-2).join('/'); // Grabs 'about-image/uuid-name.ext'
                 if (oldFileName && oldFileName.length > 0) {
-                    await supabase.storage.from('site-assets').remove([`about-image/${oldFileName}`]);
+                    await supabase.storage.from('site-assets').remove([oldFileName]);
                 }
             } catch(e) {
                 console.error("Error removing old image:", e);
@@ -61,7 +61,7 @@ export const useSiteContent = () => {
             .from('site-assets')
             .getPublicUrl(fileName);
         
-        finalContent.aboutImage = urlData.publicUrl;
+        finalContent.aboutimage = urlData.publicUrl;
     }
     
     const { data, error } = await supabase

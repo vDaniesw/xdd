@@ -30,13 +30,13 @@ const Hero: React.FC = () => {
     <section id="home" className="min-h-screen flex flex-col justify-center items-start text-left py-20">
       <div className="max-w-3xl animate-fade-in-up">
         <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-4">
-          {content.heroTitle}
+          {content.herotitle}
         </h1>
         <h2 className="text-3xl md:text-5xl font-semibold text-slate-900 dark:text-text-primary mb-6">
-          {content.heroSubtitle}
+          {content.herosubtitle}
         </h2>
         <p className="text-lg md:text-xl text-slate-600 dark:text-text-secondary mb-8">
-          {content.heroDescription}
+          {content.herodescription}
         </p>
         <div className="flex items-center gap-6">
           <a 

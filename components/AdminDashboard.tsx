@@ -10,12 +10,12 @@ const ManageProjects: React.FC = () => {
     const { projects, addProject, deleteProject, loading } = useProjects();
     const { showToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [newProject, setNewProject] = useState<Omit<Project, 'id' | 'imageUrl'>>({
+    const [newProject, setNewProject] = useState<Omit<Project, 'id' | 'imageurl'>>({
         title: '',
         description: '',
         tags: [],
-        liveUrl: '',
-        sourceUrl: '',
+        liveurl: '',
+        sourceurl: '',
     });
     const [tagsInput, setTagsInput] = useState('');
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -50,7 +50,7 @@ const ManageProjects: React.FC = () => {
             await addProject({ ...newProject, tags }, imageFile);
             showToast('Proyecto añadido con éxito!');
             
-            setNewProject({ title: '', description: '', tags: [], liveUrl: '', sourceUrl: '' });
+            setNewProject({ title: '', description: '', tags: [], liveurl: '', sourceurl: '' });
             setTagsInput('');
             setImageFile(null);
             setImagePreview(null);
@@ -95,12 +95,12 @@ const ManageProjects: React.FC = () => {
                         <input type="text" name="tags" value={tagsInput} onChange={(e) => setTagsInput(e.target.value)} required className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                     </div>
                     <div>
-                        <label htmlFor="liveUrl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL del Sitio (Opcional)</label>
-                        <input type="url" name="liveUrl" value={newProject.liveUrl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                        <label htmlFor="liveurl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL del Sitio (Opcional)</label>
+                        <input type="url" name="liveurl" value={newProject.liveurl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                     </div>
                     <div>
-                        <label htmlFor="sourceUrl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL del Código (Opcional)</label>
-                        <input type="url" name="sourceUrl" value={newProject.sourceUrl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                        <label htmlFor="sourceurl" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">URL del Código (Opcional)</label>
+                        <input type="url" name="sourceurl" value={newProject.sourceurl} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                     </div>
                     <div>
                         <label htmlFor="image" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Imagen del Proyecto</label>
@@ -118,7 +118,7 @@ const ManageProjects: React.FC = () => {
                     <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
                         {projects.map(project => (
                             <div key={project.id} className="bg-white dark:bg-secondary/30 backdrop-blur-lg p-4 rounded-lg flex items-start gap-4 border border-gray-200 dark:border-gray-800/50">
-                                <img src={project.imageUrl} alt={project.title} className="w-24 h-24 object-cover rounded-md" />
+                                <img src={project.imageurl} alt={project.title} className="w-24 h-24 object-cover rounded-md" />
                                 <div className="flex-grow">
                                     <h3 className="font-bold text-gray-800 dark:text-text-primary">{project.title}</h3>
                                     <p className="text-sm text-gray-600 dark:text-text-secondary line-clamp-2">{project.description}</p>
@@ -155,17 +155,17 @@ const MainContent: React.FC = () => {
     useEffect(() => {
         if (content) {
             setFormData(content);
-            setImagePreview(content.aboutImage);
+            setImagePreview(content.aboutimage);
         } else if (!loading) {
              setFormData({
                 id: 1,
-                heroTitle: '',
-                heroSubtitle: '',
-                heroDescription: '',
-                aboutImage: '',
-                aboutP1: '',
-                aboutP2: '',
-                aboutP3: '',
+                herotitle: '',
+                herosubtitle: '',
+                herodescription: '',
+                aboutimage: '',
+                aboutp1: '',
+                aboutp2: '',
+                aboutp3: '',
             });
             setImagePreview(null);
         }
@@ -215,36 +215,36 @@ const MainContent: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label htmlFor="aboutImage" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Foto de Perfil (Sobre Mí)</label>
-                        <input type="file" id="aboutImage" name="aboutImage" onChange={handleImageChange} accept="image/*" className="w-full text-sm text-gray-500 dark:text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-blue-700"/>
+                        <label htmlFor="aboutimage" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Foto de Perfil (Sobre Mí)</label>
+                        <input type="file" id="aboutimage" name="aboutimage" onChange={handleImageChange} accept="image/*" className="w-full text-sm text-gray-500 dark:text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-blue-700"/>
                         {imagePreview && <img src={imagePreview} alt="Preview" className="mt-4 rounded-lg max-h-40" />}
                     </div>
                     <div className="space-y-6">
                         <div>
-                            <label htmlFor="heroTitle" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Título del Hero</label>
-                            <input type="text" name="heroTitle" value={formData.heroTitle} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                            <label htmlFor="herotitle" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Título del Hero</label>
+                            <input type="text" name="herotitle" value={formData.herotitle} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                         </div>
                         <div>
-                            <label htmlFor="heroSubtitle" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Subtítulo del Hero</label>
-                            <input type="text" name="heroSubtitle" value={formData.heroSubtitle} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
+                            <label htmlFor="herosubtitle" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Subtítulo del Hero</label>
+                            <input type="text" name="herosubtitle" value={formData.herosubtitle} onChange={handleInputChange} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent" />
                         </div>
                     </div>
                 </div>
                  <div>
-                    <label htmlFor="heroDescription" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Descripción del Hero</label>
-                    <textarea name="heroDescription" value={formData.heroDescription} onChange={handleInputChange} rows={3} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
+                    <label htmlFor="herodescription" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Descripción del Hero</label>
+                    <textarea name="herodescription" value={formData.herodescription} onChange={handleInputChange} rows={3} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
                 </div>
                 <div>
-                    <label htmlFor="aboutP1" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 1</label>
-                    <textarea name="aboutP1" value={formData.aboutP1} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
+                    <label htmlFor="aboutp1" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 1</label>
+                    <textarea name="aboutp1" value={formData.aboutp1} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
                 </div>
                 <div>
-                    <label htmlFor="aboutP2" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 2</label>
-                    <textarea name="aboutP2" value={formData.aboutP2} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
+                    <label htmlFor="aboutp2" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 2</label>
+                    <textarea name="aboutp2" value={formData.aboutp2} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
                 </div>
                 <div>
-                    <label htmlFor="aboutP3" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 3</label>
-                    <textarea name="aboutP3" value={formData.aboutP3} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
+                    <label htmlFor="aboutp3" className="text-sm font-medium text-gray-700 dark:text-text-secondary block mb-2">Sobre Mí - Párrafo 3</label>
+                    <textarea name="aboutp3" value={formData.aboutp3} onChange={handleInputChange} rows={4} className="w-full bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"></textarea>
                 </div>
                 <button type="submit" disabled={isSubmitting} className="w-full bg-accent text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
                   {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}

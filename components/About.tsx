@@ -31,20 +31,20 @@ const About: React.FC = () => {
       <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
         <div className="w-full md:w-1/3 flex justify-center">
           <img 
-            src={content.aboutImage} 
+            src={content.aboutimage} 
             alt="AlonxDev Portrait"
             className="rounded-full w-64 h-64 md:w-80 md:h-80 object-cover border-4 border-slate-200 dark:border-secondary shadow-lg"
           />
         </div>
         <div className="w-full md:w-2/3 text-center md:text-left">
           <p className="text-slate-600 dark:text-text-secondary text-lg leading-relaxed mb-4">
-            {content.aboutP1}
+            {content.aboutp1}
           </p>
           <p className="text-slate-600 dark:text-text-secondary text-lg leading-relaxed mb-4">
-            {content.aboutP2}
+            {content.aboutp2}
           </p>
           <p className="text-slate-600 dark:text-text-secondary text-lg leading-relaxed">
-            {content.aboutP3}
+            {content.aboutp3}
           </p>
         </div>
       </div>

@@ -8,16 +8,16 @@ const { CodeBracketIcon, GlobeAltIcon } = ICONS;
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
   <div className="bg-white dark:bg-secondary rounded-lg overflow-hidden group transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-300/20 dark:hover:shadow-blue-900/20">
     <div className="relative overflow-hidden">
-        <img src={project.imageUrl} alt={project.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110" />
+        <img src={project.imageurl} alt={project.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110" />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <div className="flex space-x-4">
-                {project.liveUrl && (
-                    <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-accent rounded-full text-white hover:bg-blue-700 transition-colors">
+                {project.liveurl && (
+                    <a href={project.liveurl} target="_blank" rel="noopener noreferrer" className="p-3 bg-accent rounded-full text-white hover:bg-blue-700 transition-colors">
                         <GlobeAltIcon className="w-6 h-6" />
                     </a>
                 )}
-                {project.sourceUrl && (
-                    <a href={project.sourceUrl} target="_blank" rel="noopener noreferrer" className="p-3 bg-accent rounded-full text-white hover:bg-blue-700 transition-colors">
+                {project.sourceurl && (
+                    <a href={project.sourceurl} target="_blank" rel="noopener noreferrer" className="p-3 bg-accent rounded-full text-white hover:bg-blue-700 transition-colors">
                         <CodeBracketIcon className="w-6 h-6" />
                     </a>
                 )}
