@@ -58,7 +58,8 @@ const ManageProjects: React.FC = () => {
             if(fileInput) fileInput.value = '';
         } catch (error) {
             console.error(error);
-            showToast('Error al añadir el proyecto.', 'error');
+            const errorMessage = (error as Error).message;
+            showToast(`Error al añadir el proyecto: ${errorMessage}`, 'error');
         } finally {
             setIsSubmitting(false);
         }
@@ -71,7 +72,8 @@ const ManageProjects: React.FC = () => {
                 showToast('Proyecto eliminado.');
             } catch (error) {
                  console.error(error);
-                showToast('Error al eliminar el proyecto.', 'error');
+                 const errorMessage = (error as Error).message;
+                showToast(`Error al eliminar el proyecto: ${errorMessage}`, 'error');
             }
         }
     };
@@ -200,7 +202,8 @@ const MainContent: React.FC = () => {
             setImageFile(null);
         } catch (error) {
             console.error(error);
-            showToast('Error al actualizar el contenido.', 'error');
+            const errorMessage = (error as Error).message;
+            showToast(`Error al actualizar: ${errorMessage}`, 'error');
         } finally {
             setIsSubmitting(false);
         }
