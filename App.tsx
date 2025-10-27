@@ -3,6 +3,7 @@ import Portfolio from './components/Portfolio';
 import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import { AuthProvider, AuthContext } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 const AppRouter: React.FC = () => {
     const { isAuthenticated, isLoading } = useContext(AuthContext);
@@ -32,14 +33,22 @@ const AppRouter: React.FC = () => {
     }
     
     if (path === '/admin') {
-        return isAuthenticated ? <AdminDashboard /> : <Login />;
+        return isAuthenticated ? (
+            <ThemeProvider>
+                <AdminDashboard />
+            </ThemeProvider>
+        ) : <Login />;
     }
     
     if (path === '/login-55') {
         if (isAuthenticated) {
             window.history.pushState({}, '', '/admin');
             window.dispatchEvent(new Event('pushstate'));
-            return <AdminDashboard />;
+            return (
+                <ThemeProvider>
+                    <AdminDashboard />
+                </ThemeProvider>
+            );
         }
         return <Login />;
     }
