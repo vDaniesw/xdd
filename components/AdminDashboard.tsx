@@ -4,9 +4,11 @@ import type { Project, SiteContent } from '../types';
 import { AuthContext } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import { useSiteContent } from '../hooks/useSiteContent';
+import { useToast } from '../context/ToastContext';
 
 const ManageProjects: React.FC = () => {
     const { projects, addProject, deleteProject } = useProjects();
+    const { showToast } = useToast();
     const [newProject, setNewProject] = useState<Omit<Project, 'id'>>({
         title: '',
         description: '',
@@ -37,12 +39,18 @@ const ManageProjects: React.FC = () => {
         e.preventDefault();
         const tags = tagsInput.split(',').map(tag => tag.trim()).filter(Boolean);
         addProject({ ...newProject, tags });
+        showToast('Proyecto añadido con éxito!');
         
         setNewProject({ title: '', description: '', imageUrl: '', tags: [] });
         setTagsInput('');
         setImagePreview(null);
         const fileInput = document.getElementById('image') as HTMLInputElement;
         if(fileInput) fileInput.value = '';
+    };
+
+    const handleDeleteProject = (projectId: string) => {
+        deleteProject(projectId);
+        showToast('Proyecto eliminado.');
     };
 
     return (
@@ -88,7 +96,7 @@ const ManageProjects: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
-                            <button onClick={() => deleteProject(project.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 rounded-full bg-red-500/10 hover:bg-red-500/20">
+                            <button onClick={() => handleDeleteProject(project.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 rounded-full bg-red-500/10 hover:bg-red-500/20">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
                                 </svg>
@@ -103,6 +111,7 @@ const ManageProjects: React.FC = () => {
 
 const MainContent: React.FC = () => {
     const { content, updateContent } = useSiteContent();
+    const { showToast } = useToast();
     const [formData, setFormData] = useState(content);
     const [imagePreview, setImagePreview] = useState<string>(content.aboutImage);
 
@@ -126,7 +135,7 @@ const MainContent: React.FC = () => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         updateContent(formData);
-        alert('Contenido principal actualizado!');
+        showToast('Contenido principal actualizado!');
     };
     
     return (

@@ -4,6 +4,8 @@ import Login from './components/Login';
 import AdminDashboard from './components/AdminDashboard';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import ToastContainer from './components/ToastContainer';
 
 const AppRouter: React.FC = () => {
     const { isAuthenticated, isLoading } = useContext(AuthContext);
@@ -53,7 +55,10 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
         <ThemeProvider>
-            <AppRouter />
+            <ToastProvider>
+                <AppRouter />
+                <ToastContainer />
+            </ToastProvider>
         </ThemeProvider>
     </AuthProvider>
   );
