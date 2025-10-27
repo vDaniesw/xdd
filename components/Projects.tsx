@@ -6,7 +6,7 @@ import { useProjects } from '../hooks/useProjects';
 const { CodeBracketIcon, GlobeAltIcon } = ICONS;
 
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
-  <div className="bg-secondary rounded-lg overflow-hidden group transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-900/20">
+  <div className="bg-white dark:bg-secondary rounded-lg overflow-hidden group transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-300/20 dark:hover:shadow-blue-900/20">
     <div className="relative overflow-hidden">
         <img src={project.imageUrl} alt={project.title} className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-110" />
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -25,11 +25,11 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
         </div>
     </div>
     <div className="p-6">
-      <h3 className="text-xl font-bold text-text-primary mb-2">{project.title}</h3>
-      <p className="text-text-secondary mb-4 text-sm">{project.description}</p>
+      <h3 className="text-xl font-bold text-slate-900 dark:text-text-primary mb-2">{project.title}</h3>
+      <p className="text-slate-600 dark:text-text-secondary mb-4 text-sm">{project.description}</p>
       <div className="flex flex-wrap gap-2">
         {project.tags.map(tag => (
-          <span key={tag} className="bg-primary text-accent text-xs font-semibold px-3 py-1 rounded-full">
+          <span key={tag} className="bg-slate-100 dark:bg-primary text-accent text-xs font-semibold px-3 py-1 rounded-full">
             {tag}
           </span>
         ))}

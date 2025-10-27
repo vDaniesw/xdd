@@ -7,7 +7,7 @@ const Contact: React.FC = () => {
       <h2 className="text-4xl font-bold mb-4">
         Conectemos
       </h2>
-      <p className="text-text-secondary text-lg max-w-2xl mx-auto mb-8">
+      <p className="text-slate-600 dark:text-text-secondary text-lg max-w-2xl mx-auto mb-8">
         Actualmente estoy abierto a nuevas oportunidades y colaboraciones. Si tienes un proyecto en mente o simplemente quieres saludar, no dudes en contactarme.
       </p>
       <div className="flex justify-center items-center gap-8">
@@ -24,7 +24,7 @@ const Contact: React.FC = () => {
                 href={link.url} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-text-secondary hover:text-accent transition-colors duration-300"
+                className="text-slate-500 dark:text-text-secondary hover:text-accent transition-colors duration-300"
                 aria-label={link.name}
               >
                 {/* FIX: Add generic type to React.isValidElement to inform TypeScript about the element's props, resolving errors with React.cloneElement. */}

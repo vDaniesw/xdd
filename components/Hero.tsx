@@ -13,10 +13,10 @@ const Hero: React.FC = () => {
         <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-4">
           AlonxDev
         </h1>
-        <h2 className="text-3xl md:text-5xl font-semibold text-text-primary mb-6">
+        <h2 className="text-3xl md:text-5xl font-semibold text-slate-900 dark:text-text-primary mb-6">
           Construyo experiencias web modernas.
         </h2>
-        <p className="text-lg md:text-xl text-text-secondary mb-8">
+        <p className="text-lg md:text-xl text-slate-600 dark:text-text-secondary mb-8">
           Un apasionado Desarrollador Frontend especializado en crear aplicaciones web elegantes, responsivas y fáciles de usar con React y TypeScript.
         </p>
         <div className="flex items-center gap-6">
@@ -34,7 +34,7 @@ const Hero: React.FC = () => {
                 href={link.url} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="text-text-secondary hover:text-accent transition-colors duration-300"
+                className="text-slate-500 dark:text-text-secondary hover:text-accent transition-colors duration-300"
                 aria-label={link.name}
               >
                 {/* FIX: Add generic type to React.isValidElement to inform TypeScript about the element's props, resolving errors with React.cloneElement. */}

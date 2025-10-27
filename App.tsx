@@ -33,22 +33,14 @@ const AppRouter: React.FC = () => {
     }
     
     if (path === '/admin') {
-        return isAuthenticated ? (
-            <ThemeProvider>
-                <AdminDashboard />
-            </ThemeProvider>
-        ) : <Login />;
+        return isAuthenticated ? <AdminDashboard /> : <Login />;
     }
     
     if (path === '/login-55') {
         if (isAuthenticated) {
             window.history.pushState({}, '', '/admin');
             window.dispatchEvent(new Event('pushstate'));
-            return (
-                <ThemeProvider>
-                    <AdminDashboard />
-                </ThemeProvider>
-            );
+            return <AdminDashboard />;
         }
         return <Login />;
     }
@@ -60,7 +52,9 @@ const AppRouter: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-        <AppRouter />
+        <ThemeProvider>
+            <AppRouter />
+        </ThemeProvider>
     </AuthProvider>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 const navLinks = [
   { name: 'Sobre mí', href: '#about' },
@@ -31,30 +32,32 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-secondary/80 backdrop-blur-sm shadow-lg' : 'bg-transparent'}`}>
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 dark:bg-secondary/80 backdrop-blur-sm shadow-lg' : 'bg-transparent'}`}>
       <div className="container mx-auto px-6 md:px-12 py-4">
         <div className="flex justify-between items-center">
-          <a href="#" onClick={(e) => handleLinkClick(e, '#home')} className="text-2xl font-bold text-text-primary hover:text-accent transition-colors">
+          <a href="#" onClick={(e) => handleLinkClick(e, '#home')} className="text-2xl font-bold text-slate-900 dark:text-text-primary hover:text-accent transition-colors">
             AlonxDev
           </a>
           
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navLinks.map((link) => (
               <a 
                 key={link.name} 
                 href={link.href} 
                 onClick={(e) => handleLinkClick(e, link.href)}
-                className="text-text-secondary hover:text-accent transition-colors duration-300 font-medium"
+                className="text-slate-600 dark:text-text-secondary hover:text-accent transition-colors duration-300 font-medium"
               >
                 {link.name}
               </a>
             ))}
+            <ThemeToggle />
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-text-primary focus:outline-none">
+          <div className="md:hidden flex items-center gap-4">
+            <ThemeToggle />
+            <button onClick={() => setIsOpen(!isOpen)} className="text-slate-800 dark:text-text-primary focus:outline-none">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 {isOpen ? (
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -69,13 +72,13 @@ const Header: React.FC = () => {
         {/* Mobile Nav */}
         {isOpen && (
           <nav className="md:hidden mt-4 animate-slide-in">
-            <ul className="flex flex-col items-center space-y-4 bg-secondary p-4 rounded-lg">
+            <ul className="flex flex-col items-center space-y-4 bg-white dark:bg-secondary p-4 rounded-lg shadow-lg">
               {navLinks.map((link) => (
                 <li key={link.name}>
                     <a 
                         href={link.href} 
                         onClick={(e) => handleLinkClick(e, link.href)}
-                        className="block text-text-primary hover:text-accent transition-colors duration-300 py-2"
+                        className="block text-slate-800 dark:text-text-primary hover:text-accent transition-colors duration-300 py-2"
                     >
                         {link.name}
                     </a>
