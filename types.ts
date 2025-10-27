@@ -31,4 +31,8 @@ export interface SiteContent {
   aboutp1: string;
   aboutp2: string;
   aboutp3: string;
+  githuburl?: string;
+  linkedinurl?: string;
+  twitterurl?: string;
+  skills?: string[];
 }

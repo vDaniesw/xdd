@@ -1,7 +1,20 @@
 import React from 'react';
 import { SOCIAL_LINKS } from '../constants';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 const Contact: React.FC = () => {
+    const { content } = useSiteContent();
+
+    const dynamicSocialLinks = content ? [
+        { name: 'GitHub', url: content.githuburl },
+        { name: 'LinkedIn', url: content.linkedinurl },
+        { name: 'Twitter', url: content.twitterurl },
+    ].filter(link => link.url)
+      .map(link => {
+        const staticLink = SOCIAL_LINKS.find(sl => sl.name === link.name);
+        return { ...staticLink, ...link };
+      }) : [];
+
   return (
     <section id="contact" className="py-24 text-center">
       <h2 className="text-4xl font-bold mb-4">
@@ -18,7 +31,7 @@ const Contact: React.FC = () => {
           Envíame un Email
         </a>
         <div className="flex space-x-4">
-            {SOCIAL_LINKS.map(link => (
+            {dynamicSocialLinks.map(link => (
               <a 
                 key={link.name}
                 href={link.url} 
@@ -27,7 +40,6 @@ const Contact: React.FC = () => {
                 className="text-slate-500 dark:text-text-secondary hover:text-accent transition-colors duration-300"
                 aria-label={link.name}
               >
-                {/* FIX: Add generic type to React.isValidElement to inform TypeScript about the element's props, resolving errors with React.cloneElement. */}
                 {React.isValidElement<React.HTMLAttributes<HTMLElement>>(link.icon) && React.cloneElement(link.icon, { className: `${link.icon.props.className || ''} w-8 h-8` })}
               </a>
             ))}
