@@ -11,17 +11,20 @@ export const useSiteContent = () => {
 
   const fetchContent = useCallback(async () => {
     setLoading(true);
+    // Use .maybeSingle() to prevent an error when the table is empty.
+    // It will return null instead of throwing an error.
     const { data, error } = await supabase
       .from('site_content')
       .select('*')
       .eq('id', CONTENT_ID)
-      .single();
+      .maybeSingle();
 
     if (error) {
+      // This will now only log actual database errors, not "zero rows returned".
       console.error('Error fetching site content:', error.message || error);
       setContent(null);
     } else {
-      setContent(data as SiteContent);
+      setContent(data as SiteContent | null);
     }
     setLoading(false);
   }, []);
@@ -64,6 +67,7 @@ export const useSiteContent = () => {
         finalContent.aboutimage = urlData.publicUrl;
     }
     
+    // .upsert() followed by .select().single() is safe because upsert guarantees the row exists.
     const { data, error } = await supabase
       .from('site_content')
       .upsert({ ...finalContent, id: CONTENT_ID })
