@@ -9,6 +9,7 @@ export interface Project {
   liveurl?: string;
   sourceurl?: string;
   created_at?: string;
+  views?: number;
 }
 
 export interface Skill {

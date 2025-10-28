@@ -12,7 +12,7 @@ const ManageProjects: React.FC = () => {
     const { projects, addProject, deleteProject, loading } = useProjects();
     const { showToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [newProject, setNewProject] = useState<Omit<Project, 'id' | 'imageurl'>>({
+    const [newProject, setNewProject] = useState<Omit<Project, 'id' | 'imageurl' | 'views'>>({
         title: '',
         description: '',
         tags: [],
@@ -133,6 +133,7 @@ const ManageProjects: React.FC = () => {
                                         </span>
                                         ))}
                                     </div>
+                                     <p className="text-xs text-gray-500 dark:text-text-secondary mt-2">{project.views || 0} vistas</p>
                                 </div>
                                 <button onClick={() => handleDeleteProject(project.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 rounded-full bg-red-500/10 hover:bg-red-500/20">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -423,7 +424,7 @@ const ManageMessages: React.FC = () => {
                      No has recibido ningún mensaje todavía.
                  </p>
              ) : (
-                <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
+                <div className="space-y-6 overflow-y-auto pr-2" style={{ height: 'calc(100vh - 250px)' }}>
                     {messages.map(msg => (
                         <div key={msg.id} className="bg-white dark:bg-secondary/30 p-6 rounded-lg border border-gray-200 dark:border-gray-700/50 relative">
                             <div className="flex justify-between items-start">
@@ -451,10 +452,74 @@ const ManageMessages: React.FC = () => {
     )
 }
 
+const Dashboard: React.FC = () => {
+    const [stats, setStats] = useState({ projects: 0, messages: 0, views: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            setLoading(true);
+            try {
+                const { count: projectsCount, error: projectsError } = await supabase.from('projects').select('*', { count: 'exact', head: true });
+                if (projectsError) throw projectsError;
+
+                const { count: messagesCount, error: messagesError } = await supabase.from('messages').select('*', { count: 'exact', head: true });
+                if (messagesError) throw messagesError;
+                
+                const { data: viewsData, error: viewsError } = await supabase.from('projects').select('views');
+                if(viewsError) throw viewsError;
+                const totalViews = viewsData.reduce((acc, p) => acc + (p.views || 0), 0);
+
+                setStats({
+                    projects: projectsCount ?? 0,
+                    messages: messagesCount ?? 0,
+                    views: totalViews,
+                });
+            } catch (error) {
+                console.error("Error fetching stats:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+    
+    if (loading) {
+        return (
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
+                <div className="bg-white dark:bg-secondary/30 h-36 rounded-lg"></div>
+                <div className="bg-white dark:bg-secondary/30 h-36 rounded-lg"></div>
+                <div className="bg-white dark:bg-secondary/30 h-36 rounded-lg"></div>
+            </div>
+        )
+    }
+
+    return (
+        <div>
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Estadísticas</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-secondary/30 p-6 rounded-lg border border-gray-200 dark:border-gray-700/50">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-text-secondary">Proyectos Totales</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-text-primary mt-2">{stats.projects}</p>
+                </div>
+                <div className="bg-white dark:bg-secondary/30 p-6 rounded-lg border border-gray-200 dark:border-gray-700/50">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-text-secondary">Mensajes Recibidos</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-text-primary mt-2">{stats.messages}</p>
+                </div>
+                <div className="bg-white dark:bg-secondary/30 p-6 rounded-lg border border-gray-200 dark:border-gray-700/50">
+                    <h3 className="text-sm font-medium text-gray-500 dark:text-text-secondary">Vistas de Proyectos</h3>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-text-primary mt-2">{stats.views}</p>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 
 const AdminDashboard: React.FC = () => {
     const { logout } = useContext(AuthContext);
-    const [activeTab, setActiveTab] = useState<'projects' | 'main' | 'links' | 'messages'>('main');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'projects' | 'main' | 'links' | 'messages'>('dashboard');
     
     return (
         <div className="min-h-screen p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-primary transition-colors duration-300">
@@ -471,6 +536,12 @@ const AdminDashboard: React.FC = () => {
 
                 <div className="mb-8 flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
                      <button 
+                        onClick={() => setActiveTab('dashboard')}
+                        className={`py-3 px-6 font-medium text-lg transition-colors flex-shrink-0 ${activeTab === 'dashboard' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                    >
+                        Dashboard
+                    </button>
+                    <button 
                         onClick={() => setActiveTab('main')}
                         className={`py-3 px-6 font-medium text-lg transition-colors flex-shrink-0 ${activeTab === 'main' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
                     >
@@ -496,6 +567,7 @@ const AdminDashboard: React.FC = () => {
                     </button>
                 </div>
 
+                {activeTab === 'dashboard' && <Dashboard />}
                 {activeTab === 'projects' && <ManageProjects />}
                 {activeTab === 'main' && <MainContent />}
                 {activeTab === 'links' && <ManageLinksAndSkills />}

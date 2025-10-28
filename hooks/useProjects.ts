@@ -27,7 +27,7 @@ export const useProjects = () => {
     fetchProjects();
   }, [fetchProjects]);
 
-  const addProject = async (projectData: Omit<Project, 'id' | 'imageurl'>, imageFile: File) => {
+  const addProject = async (projectData: Omit<Project, 'id' | 'imageurl' | 'views'>, imageFile: File) => {
     const fileName = `${uuidv4()}-${imageFile.name}`;
     const { error: uploadError } = await supabase.storage
       .from('project-images')
@@ -46,7 +46,7 @@ export const useProjects = () => {
 
     const { data: insertData, error: insertError } = await supabase
       .from('projects')
-      .insert([{ ...projectData, imageurl: imageUrl }])
+      .insert([{ ...projectData, imageurl: imageUrl, views: 0 }])
       .select();
 
     if (insertError) {

@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import type { Project } from '../types';
 import { ICONS } from '../constants';
 import { useProjects } from '../hooks/useProjects';
+import { supabase } from '../lib/supabaseClient';
+
 
 const { CodeBracketIcon, GlobeAltIcon } = ICONS;
+
+const handleViewCount = async (project: Project) => {
+    if (!project.id) return;
+    const newViews = (project.views || 0) + 1;
+    await supabase
+        .from('projects')
+        .update({ views: newViews })
+        .eq('id', project.id);
+};
 
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
   <div className="bg-white dark:bg-secondary rounded-lg overflow-hidden group transform transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-blue-300/20 dark:hover:shadow-blue-900/20">
@@ -12,7 +23,7 @@ const ProjectCard: React.FC<{ project: Project }> = ({ project }) => (
         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <div className="flex space-x-4">
                 {project.liveurl && (
-                    <a href={project.liveurl} target="_blank" rel="noopener noreferrer" className="p-3 bg-accent rounded-full text-white hover:bg-blue-700 transition-colors">
+                    <a href={project.liveurl} target="_blank" rel="noopener noreferrer" onClick={() => handleViewCount(project)} className="p-3 bg-accent rounded-full text-white hover:bg-blue-700 transition-colors">
                         <GlobeAltIcon className="w-6 h-6" />
                     </a>
                 )}
@@ -57,12 +68,38 @@ const ProjectSkeleton: React.FC = () => (
 
 const Projects: React.FC = () => {
   const { projects, loading } = useProjects();
+  const [activeFilter, setActiveFilter] = useState<string>('Todos');
+
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    projects.forEach(p => p.tags.forEach(tag => tags.add(tag)));
+    return ['Todos', ...Array.from(tags)];
+  }, [projects]);
+  
+  const filteredProjects = useMemo(() => {
+      if (activeFilter === 'Todos') return projects;
+      return projects.filter(p => p.tags.includes(activeFilter));
+  }, [projects, activeFilter]);
   
   return (
     <section id="projects" className="py-24">
-      <h2 className="text-4xl font-bold text-center mb-12">
+      <h2 className="text-4xl font-bold text-center mb-6">
         Mis <span className="text-accent">Proyectos</span>
       </h2>
+      
+      {!loading && projects.length > 0 && (
+         <div className="flex flex-wrap justify-center gap-2 mb-12">
+            {allTags.map(tag => (
+                <button
+                    key={tag}
+                    onClick={() => setActiveFilter(tag)}
+                    className={`px-4 py-2 text-sm font-semibold rounded-full transition-colors duration-300 ${activeFilter === tag ? 'bg-accent text-white' : 'bg-slate-200 dark:bg-secondary/50 text-slate-700 dark:text-text-secondary hover:bg-accent/20'}`}
+                >
+                    {tag}
+                </button>
+            ))}
+        </div>
+      )}
         
       {!loading && projects.length === 0 && (
           <div className="text-center bg-slate-100 dark:bg-secondary/30 p-8 rounded-lg">
@@ -80,7 +117,7 @@ const Projects: React.FC = () => {
         {loading ? (
              Array.from({ length: 3 }).map((_, index) => <ProjectSkeleton key={index} />)
         ) : (
-            projects.map((project) => (
+            filteredProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />
             ))
         )}
