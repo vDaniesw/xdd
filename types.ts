@@ -45,3 +45,12 @@ export interface Message {
   message: string;
   created_at: string;
 }
+
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  description: string | null;
+  html_url: string;
+  homepage: string | null;
+  topics: string[];
+}

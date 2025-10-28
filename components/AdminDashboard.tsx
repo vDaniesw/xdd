@@ -1,6 +1,6 @@
-import React, { useState, FormEvent, useContext, ChangeEvent, useEffect, useCallback } from 'react';
+import React, { useState, FormEvent, useContext, ChangeEvent, useEffect, useCallback, useRef } from 'react';
 import { useProjects } from '../hooks/useProjects';
-import type { Project, SiteContent, Message } from '../types';
+import type { Project, SiteContent, Message, GitHubRepo } from '../types';
 import { AuthContext } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import { useSiteContent } from '../hooks/useSiteContent';
@@ -22,6 +22,14 @@ const ManageProjects: React.FC = () => {
     const [tagsInput, setTagsInput] = useState('');
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    
+    // GitHub Sync State
+    const [githubUsername, setGithubUsername] = useState('');
+    const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
+    const [isFetchingRepos, setIsFetchingRepos] = useState(false);
+    const [fetchError, setFetchError] = useState<string | null>(null);
+    const formRef = useRef<HTMLDivElement>(null);
+
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setNewProject({ ...newProject, [e.target.name]: e.target.value });
@@ -80,9 +88,45 @@ const ManageProjects: React.FC = () => {
         }
     };
 
+    const handleFetchRepos = async (e: FormEvent) => {
+        e.preventDefault();
+        if (!githubUsername) return;
+        setIsFetchingRepos(true);
+        setFetchError(null);
+        setGithubRepos([]);
+        try {
+            const response = await fetch(`https://api.github.com/users/${githubUsername}/repos?sort=updated&direction=desc&per_page=30`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || `Error: ${response.statusText}`);
+            }
+            const data: GitHubRepo[] = await response.json();
+            setGithubRepos(data);
+        } catch (err) {
+            const errorMessage = (err as Error).message;
+            setFetchError(errorMessage);
+            showToast(`Error al buscar repositorios: ${errorMessage}`, 'error');
+        } finally {
+            setIsFetchingRepos(false);
+        }
+    };
+
+    const handleImportRepo = (repo: GitHubRepo) => {
+        setNewProject({
+            title: repo.name || '',
+            description: repo.description || 'Sin descripción.',
+            tags: [], // Tags are handled by tagsInput
+            liveurl: repo.homepage || '',
+            sourceurl: repo.html_url || '',
+        });
+        setTagsInput((repo.topics || []).join(', '));
+        showToast(`'${repo.name}' importado. Sube una imagen para finalizar.`);
+        formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="bg-white dark:bg-secondary/30 backdrop-blur-lg border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8">
+            <div ref={formRef} className="bg-white dark:bg-secondary/30 backdrop-blur-lg border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8">
                 <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Añadir Nuevo Proyecto</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Form fields */}
@@ -117,6 +161,56 @@ const ManageProjects: React.FC = () => {
                 </form>
             </div>
             <div>
+                 <div className="bg-white dark:bg-secondary/30 backdrop-blur-lg border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8 mb-8">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-text-primary">Sincronizar desde GitHub</h2>
+                    <p className="text-sm text-gray-600 dark:text-text-secondary mb-6">
+                        Importa tus repositorios públicos para añadirlos rápidamente a tu portafolio.
+                    </p>
+                    <form onSubmit={handleFetchRepos} className="flex flex-col sm:flex-row gap-4 mb-6">
+                        <input
+                            type="text"
+                            value={githubUsername}
+                            onChange={(e) => setGithubUsername(e.target.value)}
+                            placeholder="Tu nombre de usuario de GitHub"
+                            className="flex-grow bg-gray-100 dark:bg-primary/50 border border-gray-300 dark:border-gray-600/50 rounded-lg px-4 py-2 text-gray-900 dark:text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
+                            required
+                        />
+                        <button
+                            type="submit"
+                            disabled={isFetchingRepos}
+                            className="bg-accent text-white font-semibold px-6 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed flex-shrink-0"
+                        >
+                            {isFetchingRepos ? 'Buscando...' : 'Buscar Repositorios'}
+                        </button>
+                    </form>
+
+                    {isFetchingRepos && <div className="text-center p-4">Cargando repositorios...</div>}
+                    {fetchError && !isFetchingRepos && <p className="text-red-500 text-center p-4">{fetchError}</p>}
+                    
+                    {githubRepos.length > 0 && (
+                        <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+                            {githubRepos.map(repo => {
+                                const isImported = projects.some(p => p.sourceurl === repo.html_url);
+                                return (
+                                    <div key={repo.id} className="bg-gray-50 dark:bg-secondary/50 p-3 rounded-lg flex items-center justify-between gap-4">
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 dark:text-text-primary">{repo.name}</h4>
+                                            <p className="text-xs text-gray-600 dark:text-text-secondary line-clamp-1">{repo.description || 'Sin descripción.'}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => handleImportRepo(repo)}
+                                            disabled={isImported}
+                                            className="bg-accent/20 text-accent font-semibold text-sm px-4 py-1.5 rounded-md hover:bg-accent/30 disabled:bg-gray-200 disabled:dark:bg-primary disabled:text-gray-400 disabled:dark:text-text-secondary disabled:cursor-not-allowed flex-shrink-0"
+                                        >
+                                            {isImported ? 'Importado' : 'Importar'}
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Proyectos Existentes ({projects.length})</h2>
                  {loading ? (<p>Cargando proyectos...</p>) : (
                     <div className="space-y-4 max-h-[80vh] overflow-y-auto pr-2">
@@ -136,7 +230,7 @@ const ManageProjects: React.FC = () => {
                                      <p className="text-xs text-gray-500 dark:text-text-secondary mt-2">{project.views || 0} vistas</p>
                                 </div>
                                 <button onClick={() => handleDeleteProject(project.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 rounded-full bg-red-500/10 hover:bg-red-500/20">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg xmlns="http://www.w.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
                                     </svg>
                                 </button>
