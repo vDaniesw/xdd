@@ -1,11 +1,12 @@
-import React, { useState, FormEvent, useContext, ChangeEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useContext, ChangeEvent, useEffect, useCallback } from 'react';
 import { useProjects } from '../hooks/useProjects';
-import type { Project, SiteContent } from '../types';
+import type { Project, SiteContent, Message } from '../types';
 import { AuthContext } from '../context/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import { useSiteContent } from '../hooks/useSiteContent';
 import { useToast } from '../context/ToastContext';
 import { SKILLS } from '../constants';
+import { supabase } from '../lib/supabaseClient';
 
 const ManageProjects: React.FC = () => {
     const { projects, addProject, deleteProject, loading } = useProjects();
@@ -370,9 +371,90 @@ const ManageLinksAndSkills: React.FC = () => {
     );
 }
 
+const ManageMessages: React.FC = () => {
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { showToast } = useToast();
+
+    const fetchMessages = useCallback(async () => {
+        setLoading(true);
+        const { data, error } = await supabase
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) {
+            console.error("Error fetching messages:", error);
+            showToast(`Error al cargar mensajes: ${error.message}`, 'error');
+            setMessages([]);
+        } else {
+            setMessages(data as Message[]);
+        }
+        setLoading(false);
+    }, [showToast]);
+
+    useEffect(() => {
+        fetchMessages();
+    }, [fetchMessages]);
+
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("¿Estás seguro de que quieres eliminar este mensaje?")) return;
+
+        const { error } = await supabase.from('messages').delete().eq('id', id);
+
+        if (error) {
+            console.error("Error deleting message:", error);
+            showToast(`Error al eliminar el mensaje: ${error.message}`, 'error');
+        } else {
+            showToast("Mensaje eliminado con éxito.");
+            setMessages(prev => prev.filter(msg => msg.id !== id));
+        }
+    };
+    
+    if (loading) {
+        return <p>Cargando mensajes...</p>
+    }
+
+    return (
+        <div>
+             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-text-primary">Mensajes Recibidos ({messages.length})</h2>
+             {messages.length === 0 ? (
+                 <p className="text-center text-gray-500 dark:text-text-secondary p-8 bg-white dark:bg-secondary/30 rounded-lg">
+                     No has recibido ningún mensaje todavía.
+                 </p>
+             ) : (
+                <div className="space-y-6 max-h-[80vh] overflow-y-auto pr-2">
+                    {messages.map(msg => (
+                        <div key={msg.id} className="bg-white dark:bg-secondary/30 p-6 rounded-lg border border-gray-200 dark:border-gray-700/50 relative">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="font-bold text-lg text-gray-800 dark:text-text-primary">{msg.name}</p>
+                                    <a href={`mailto:${msg.email}`} className="text-sm text-accent hover:underline">{msg.email}</a>
+                                </div>
+                                <div className="text-right">
+                                     <p className="text-xs text-gray-500 dark:text-text-secondary">
+                                        {new Date(msg.created_at).toLocaleString()}
+                                     </p>
+                                     <button onClick={() => handleDelete(msg.id)} className="text-red-500 hover:text-red-400 transition-colors p-1 mt-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                             <p className="mt-4 text-gray-700 dark:text-text-secondary whitespace-pre-wrap">{msg.message}</p>
+                        </div>
+                    ))}
+                </div>
+             )}
+        </div>
+    )
+}
+
+
 const AdminDashboard: React.FC = () => {
     const { logout } = useContext(AuthContext);
-    const [activeTab, setActiveTab] = useState<'projects' | 'main' | 'links'>('projects');
+    const [activeTab, setActiveTab] = useState<'projects' | 'main' | 'links' | 'messages'>('main');
     
     return (
         <div className="min-h-screen p-4 sm:p-6 md:p-8 bg-gray-50 dark:bg-primary transition-colors duration-300">
@@ -387,30 +469,37 @@ const AdminDashboard: React.FC = () => {
                     </div>
                 </header>
 
-                <div className="mb-8 flex border-b border-gray-200 dark:border-gray-700">
+                <div className="mb-8 flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
                      <button 
                         onClick={() => setActiveTab('main')}
-                        className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'main' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                        className={`py-3 px-6 font-medium text-lg transition-colors flex-shrink-0 ${activeTab === 'main' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
                     >
                         Principal
                     </button>
                     <button 
                         onClick={() => setActiveTab('projects')}
-                        className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'projects' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                        className={`py-3 px-6 font-medium text-lg transition-colors flex-shrink-0 ${activeTab === 'projects' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
                     >
-                        Gestionar Proyectos
+                        Proyectos
                     </button>
                      <button 
                         onClick={() => setActiveTab('links')}
-                        className={`py-3 px-6 font-medium text-lg transition-colors ${activeTab === 'links' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                        className={`py-3 px-6 font-medium text-lg transition-colors flex-shrink-0 ${activeTab === 'links' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
                     >
                         Enlaces y Habilidades
+                    </button>
+                    <button 
+                        onClick={() => setActiveTab('messages')}
+                        className={`py-3 px-6 font-medium text-lg transition-colors flex-shrink-0 ${activeTab === 'messages' ? 'border-b-2 border-accent text-accent' : 'text-gray-500 dark:text-text-secondary hover:text-accent'}`}
+                    >
+                        Mensajes
                     </button>
                 </div>
 
                 {activeTab === 'projects' && <ManageProjects />}
                 {activeTab === 'main' && <MainContent />}
                 {activeTab === 'links' && <ManageLinksAndSkills />}
+                {activeTab === 'messages' && <ManageMessages />}
 
             </div>
         </div>

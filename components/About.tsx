@@ -27,7 +27,7 @@ const About: React.FC = () => {
       <h2 className="text-4xl font-bold text-center mb-12">
         Sobre <span className="text-accent">Mí</span>
       </h2>
-      <div className="max-w-3xl mx-auto text-center">
+      <div className="max-w-3xl mx-auto text-left">
         <p className="text-slate-600 dark:text-text-secondary text-lg leading-relaxed mb-4">
           {content.aboutp1}
         </p>
