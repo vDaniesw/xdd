@@ -23,14 +23,14 @@ const Hero: React.FC = () => {
 
     if (loading) {
         return (
-          <section id="home" className="min-h-screen flex items-center justify-center py-20">
-            <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16 animate-pulse">
-              <div className="w-full md:w-1/3 flex justify-center md:justify-start">
-                <div className="rounded-full bg-slate-200 dark:bg-slate-700 w-56 h-56 md:w-64 md:h-64"></div>
+          <section id="home" className="py-24 md:py-32">
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 animate-pulse">
+              <div className="w-auto flex-shrink-0">
+                <div className="rounded-full bg-slate-200 dark:bg-slate-700 w-48 h-48 md:w-56 md:h-56"></div>
               </div>
-              <div className="w-full md:w-2/3">
-                <div className="h-16 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-4"></div>
-                <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-full mb-6"></div>
+              <div className="w-full">
+                <div className="h-14 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-4"></div>
+                <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded w-full mb-6"></div>
                 <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-5/6 mb-8"></div>
                 <div className="h-12 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
               </div>
@@ -41,7 +41,7 @@ const Hero: React.FC = () => {
       
     if (!content || !content.herotitle) {
         return (
-            <section id="home" className="min-h-screen flex flex-col justify-center items-center text-center py-20">
+            <section id="home" className="py-24 md:py-32 flex flex-col justify-center items-center text-center">
                 <div className="max-w-3xl animate-fade-in-up">
                     <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-text-primary mb-6">
                         ¡Bienvenido a tu Portafolio!
@@ -61,16 +61,16 @@ const Hero: React.FC = () => {
     }
 
   return (
-    <section id="home" className="min-h-screen flex items-center justify-center py-20">
-      <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
-        <div className="w-full md:w-1/3 flex justify-center md:justify-start animate-fade-in-up">
+    <section id="home" className="py-24 md:py-32">
+      <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+        <div className="w-auto flex-shrink-0 animate-fade-in-up">
           <img 
             src={content.aboutimage} 
             alt="AlonxDev Portrait"
-            className="rounded-full w-56 h-56 md:w-64 md:h-64 object-cover border-4 border-slate-200 dark:border-secondary shadow-lg"
+            className="rounded-full w-48 h-48 md:w-56 md:h-56 object-cover border-4 border-slate-200 dark:border-secondary shadow-lg"
           />
         </div>
-        <div className="w-full md:w-2/3 text-center md:text-left animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <div className="w-full text-center md:text-left animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600 mb-4">
             {content.herotitle}
           </h1>
